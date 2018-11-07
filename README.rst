@@ -115,6 +115,10 @@ Here is the reporters prebuild with django-jenkins
 Changelog
 ---------
 
+2018-11-07
+~~~~~~~~~~~~~~~~~~
+* Generate coverage even if test is failed.
+
 GIT Version
 ~~~~~~~~~~~~~~~~~~
 
