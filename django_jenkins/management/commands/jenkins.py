@@ -103,26 +103,27 @@ class Command(TestCommand):
 
         failures = test_runner.run_tests(test_labels)
 
+        tested_locations = self.get_tested_locations(test_labels)
+
+        coverage = apps.get_app_config('django_jenkins').coverage
+        if coverage:
+            if options['verbosity'] >= 1:
+                print('Storing coverage info...')
+
+            coverage.save(tested_locations, options)
+
+        # run reporters
+        for task in self.tasks:
+            if options['verbosity'] >= 1:
+                print('Executing {0}...'.format(task.__module__))
+            task.run(tested_locations, **options)
+
+        if options['verbosity'] >= 1:
+            print('Done')
+
         if failures:
             sys.exit(bool(failures))
-        else:
-            tested_locations = self.get_tested_locations(test_labels)
 
-            coverage = apps.get_app_config('django_jenkins').coverage
-            if coverage:
-                if options['verbosity'] >= 1:
-                    print('Storing coverage info...')
-
-                coverage.save(tested_locations, options)
-
-            # run reporters
-            for task in self.tasks:
-                if options['verbosity'] >= 1:
-                    print('Executing {0}...'.format(task.__module__))
-                task.run(tested_locations, **options)
-
-            if options['verbosity'] >= 1:
-                print('Done')
 
     def get_tested_locations(self, test_labels):
         locations = []
